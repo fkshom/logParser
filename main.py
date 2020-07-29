@@ -212,7 +212,7 @@ def main(data):
 
 if __name__ == "__main__":
 
-    data = """
+    data = """ # noqa: E501
 Jun 30 00:22:28 ubuntu dbus-daemon[818]: [system] Successfully activated service 'org.freedesktop.nm_dispatcher'
 Jun 30 00:22:39 ubuntu systemd[1]: NetworkManager-dispatcher.service: Succeeded.
 Jun 30 00:25:58 ubuntu systemd-resolved[775]: Server returned error NXDOMAIN, mitigating potential DNS violation DVE-2018-0001, retrying transaction with reduced feature level UDP.
