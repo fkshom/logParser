@@ -1,9 +1,9 @@
 import collections
-import sys
 import re
 import datetime
 from dateutil.parser import parse
 from pprint import pprint
+
 
 class DefaultReader():
   @classmethod
@@ -24,10 +24,11 @@ class DefaultReader():
         continue
       yield line
 
+
 class DefaultReader1():
   def __init__(self, data):
     self.data = data
-  
+
   def __iter__(self):
     if type(self.data) is str:
       return iter(data.splitlines(True))
@@ -35,31 +36,33 @@ class DefaultReader1():
       return iter(data)
     else:
       raise Exception(f"type {type(data)} is not supported")
-    
+
+
 class MultilineReader1():
   def __init__(self, data):
     self.data = data
 
-  def set_start_marker(self, start_markter):
+  def set_start_marker(self, start_marker):
     self.start_marker = start_marker
 
   def __iter__(self):
     return self
-  
+
   def __next__(self):
     pass
-  
+
+
 class MultilineReader(DefaultReader):
-  start_marker = "^(\w\w\w +\d+ \d\d:\d\d:\d\d) ([^ ]+) (.+)\[(\d+)]: "
-  
+  start_marker = r"^(\w\w\w +\d+ \d\d:\d\d:\d\d) ([^ ]+) (.+)\[(\d+)]: "
+
   @classmethod
-  def set_start_marker(cls, start_markter):
+  def set_start_marker(cls, start_marker):
     cls.start_marker = start_marker
 
   @classmethod
   def read(cls, data):
     # 最初にごみはない前提
-    readiter = iter( cls._readline(data) )
+    readiter = iter(cls._readline(data))
     entry = next(readiter)
     for line in readiter:
       if re.search(cls.start_marker, line):
@@ -69,6 +72,7 @@ class MultilineReader(DefaultReader):
         entry += line
     yield entry
 
+
 class DefaultTokenizer():
   @classmethod
   def tokenize(cls, string):
@@ -77,23 +81,24 @@ class DefaultTokenizer():
   def __init__(self, message):
     self.message = message
 
+
 class SyslogTokenizer():
   today = datetime.datetime.now()
   thisyear = today.year
-   
+
   @classmethod
   def tokenize(cls, string):
     if string.strip() == "":
       return dict()
 
-    m = re.match("(\w\w\w +\d+ \d\d:\d\d:\d\d) ([^ ]+) (.+)\[(\d+)]: (.*)", string, re.MULTILINE + re.DOTALL)
-    if m == None:
+    m = re.match(r"(\w\w\w +\d+ \d\d:\d\d:\d\d) ([^ ]+) (.+)\[(\d+)]: (.*)", string, re.MULTILINE + re.DOTALL)
+    if m is None:
       return None
 
     dtstr = m.group(1)
     dt = parse(dtstr).replace(year=cls.thisyear)
     if cls.today < dt:
-      dt = dt.replace(year=cls.thisyear-1)
+      dt = dt.replace(year=cls.thisyear - 1)
 
     hostname = m.group(2)
     processname = m.group(3)
@@ -104,6 +109,7 @@ class SyslogTokenizer():
   def __init__(self, **kwargs):
     self.__dict__.update(kwargs)
 
+
 class DefaultObjectifier():
   @classmethod
   def parse(cls, token):
@@ -111,6 +117,7 @@ class DefaultObjectifier():
 
   def __init__(self, token):
     self.__dict__.update(token)
+
 
 class SystemdLogind():
   @classmethod
@@ -121,19 +128,19 @@ class SystemdLogind():
       return None
 
     tokens['object'] = None
-    if m := re.match('New session (?P<id>\d+) of user (?P<user>\w+).', tokens['message']):
+    if m := re.match(r'New session (?P<id>\d+) of user (?P<user>\w+).', tokens['message']):
       sessionid = int(m.group('id'))
       user = m.group('user')
       tokens['object'] = {
-        'type': 'new',
-        'id': sessionid,
-        'user': user
+          'type': 'new',
+          'id': sessionid,
+          'user': user
       }
-    elif m := re.match('Removed session (?P<id>\d+).', tokens['message']):
+    elif m := re.match(r'Removed session (?P<id>\d+).', tokens['message']):
       sessionid = int(m.group('id'))
       tokens['object'] = {
-        'type': 'del',
-        'id': sessionid,
+          'type': 'del',
+          'id': sessionid,
       }
     else:
       print('Unknown log entry type: ' + str(tokens))
@@ -142,6 +149,7 @@ class SystemdLogind():
 
   def __init__(self, token):
     self.__dict__.update(token)
+
 
 class LogParser():
     def __init__(self):
@@ -188,10 +196,11 @@ class LogParser():
         obj = self._parse(tokens)
         yield obj
 
+
 def main(data):
     parser = LogParser()
-    #parser.setReader(DefaultReader)
-    #parser.setReader(MultilineReader)
+    # parser.setReader(DefaultReader)
+    # parser.setReader(MultilineReader)
     parser.addTokenizer(SyslogTokenizer)
     parser.addObjectifier(SystemdLogind)
     reader = iter(DefaultReader().read(data))
@@ -199,6 +208,7 @@ def main(data):
     it = parser.parse(reader)
     for entry in it:
       pprint(vars(entry))
+
 
 if __name__ == "__main__":
 
@@ -224,4 +234,3 @@ May 25 12:25:00 dev systemd-logind[1]: Removed session 0.
 Jul 30 00:37:28 ubuntu NetworkManager[820]: <info>  [1593445048.6736] dhcp4 (ens33): option ip_address           => '192.168.61.131'
 """
     main(data)
-
