@@ -24,6 +24,31 @@ class DefaultReader():
         continue
       yield line
 
+class DefaultReader1():
+  def __init__(self, data):
+    self.data = data
+  
+  def __iter__(self):
+    if type(self.data) is str:
+      return iter(data.splitlines(True))
+    elif isinstance(data, collections.Iterable):
+      return iter(data)
+    else:
+      raise Exception(f"type {type(data)} is not supported")
+    
+class MultilineReader1():
+  def __init__(self, data):
+    self.data = data
+
+  def set_start_marker(self, start_markter):
+    self.start_marker = start_marker
+
+  def __iter__(self):
+    return self
+  
+  def __next__(self):
+    pass
+  
 class MultilineReader(DefaultReader):
   start_marker = "^(\w\w\w +\d+ \d\d:\d\d:\d\d) ([^ ]+) (.+)\[(\d+)]: "
   
@@ -157,8 +182,8 @@ class LogParser():
       else:
         return self.default_objectifier.parse(tokens)
 
-    def parse(self, data):
-      for entry in self._reader(data):
+    def parse(self, entries):
+      for entry in entries:
         tokens = self._tokenize(entry)
         obj = self._parse(tokens)
         yield obj
@@ -166,10 +191,12 @@ class LogParser():
 def main(data):
     parser = LogParser()
     #parser.setReader(DefaultReader)
-    parser.setReader(MultilineReader)
+    #parser.setReader(MultilineReader)
     parser.addTokenizer(SyslogTokenizer)
     parser.addObjectifier(SystemdLogind)
-    it = parser.parse(data)
+    reader = iter(DefaultReader().read(data))
+    reader = iter(MultilineReader().read(data))
+    it = parser.parse(reader)
     for entry in it:
       pprint(vars(entry))
 
