@@ -9,9 +9,14 @@ def main(data):
     parser.addObjectifier(SystemdLogind)
     reader = iter(DefaultReader().read(data))
     reader = iter(MultilineReader().read(data))
-    it = parser.parse(reader)
-    for entry in it:
-      pprint(vars(entry))
+    # it = parser.parse(reader)
+    # for entry in it:
+    #   pprint(vars(entry))
+
+    entries = list(parser.parse(reader))
+
+    # login and logout in 1minutes
+    [entry for entry in entries if entry['processname'] == 'systemd-logind']
 
 
 if __name__ == "__main__":
