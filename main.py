@@ -33,6 +33,11 @@ debug1
 May 25 13:30:00 dev systemd-logind[1]: Removed session 2.
 May 25 13:40:00 dev systemd-logind[1]: Removed session 3.
 May 25 13:50:00 dev systemd-logind[1]: Removed session 4.
+May 25 13:50:00 dev knockd[1]: 192.168.1.1: openSSH: Stage1
+May 25 13:50:01 dev knockd[1]: 192.168.1.1: openSSH: Stage2
+May 25 13:50:02 dev knockd[1]: 192.168.1.1: openSSH: OPEN SESAME
+May 25 13:50:02 dev knockd[1]: openSSH: running command: /bin/iptables -I ...
+May 25 13:50:05 dev knockd[1]: closeSSH: running command: /bin/iptables -D ...
 May 25 13:00:00 dev systemd-logind[1]: New session 2 of user user2.
 May 25 13:10:00 dev systemd-logind[1]: New session 3 of user user3.
 May 25 13:20:00 dev systemd-logind[1]: New session 4 of user user4.
