@@ -9,7 +9,7 @@ def validate_login_frequency(entries):
     """
     1分間に60回以上ログイン失敗がないかを調べる
     """
-    pass
+    pprint(vars(entries[5]))
 
 def main(data):
     parser = LogParser()
@@ -30,7 +30,7 @@ def main(data):
 
 if __name__ == "__main__":
 
-    data = """ # noqa: E501
+    data = """\
 Jun 30 00:22:28 ubuntu dbus-daemon[818]: [system] Successfully activated service 'org.freedesktop.nm_dispatcher'
 Jun 30 00:22:39 ubuntu systemd[1]: NetworkManager-dispatcher.service: Succeeded.
 Jun 30 00:25:58 ubuntu systemd-resolved[775]: Server returned error NXDOMAIN, mitigating potential DNS violation DVE-2018-0001, retrying transaction with reduced feature level UDP.
@@ -55,5 +55,5 @@ May 25 13:30:00 dev systemd-logind[1]: New session 5 of user user5a.
 May 25 11:50:00 dev systemd-logind[1]: Removed session 0.
 May 25 12:25:00 dev systemd-logind[1]: Removed session 0.
 Jul 30 00:37:28 ubuntu NetworkManager[820]: <info>  [1593445048.6736] dhcp4 (ens33): option ip_address           => '192.168.61.131'
-"""
+"""  # noqa: E501
     main(data)
