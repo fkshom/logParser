@@ -1,7 +1,15 @@
 
 from pprint import pprint
-from lib.logparser import LogParser, SyslogTokenizer, SystemdLogind, DefaultReader, MultilineReader
+from lib.logparser import LogParser
+from lib.logparser.reader import DefaultReader, MultilineReader
+from lib.logparser.tokenizer import SyslogTokenizer
+from lib.logparser.objectifier import SystemdLogind
 
+def validate_login_frequency(entries):
+    """
+    1分間に60回以上ログイン失敗がないかを調べる
+    """
+    pass
 
 def main(data):
     parser = LogParser()
@@ -15,8 +23,9 @@ def main(data):
 
     entries = list(parser.parse(reader))
 
+    validate_login_frequency(entries)
     # login and logout in 1minutes
-    [entry for entry in entries if entry['processname'] == 'systemd-logind']
+    #[entry for entry in entries if entry['processname'] == 'systemd-logind']
 
 
 if __name__ == "__main__":
